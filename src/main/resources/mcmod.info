@@ -1,0 +1,16 @@
+[
+{
+  "modid": "schematicsoverload",
+  "name": "Schematics Overload",
+  "description": "Schematic creator and loader mod and API",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Turkey2349"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
