@@ -6,15 +6,14 @@ import java.util.List;
 import com.theprogrammningturkey.schematicsoverload.SchematicsCore;
 import com.theprogrammningturkey.schematicsoverload.util.SchematicUtil;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -58,11 +57,17 @@ public class SchematicsServerCommands extends CommandBase
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
-		if(args.length > 0 && args[0].equalsIgnoreCase("reload"))
+		if(args.length == 0)
+		{
+			invalidArguments(sender);
+			return;
+		}
+
+		if(args[0].equalsIgnoreCase("reload"))
 		{
 			sender.addChatMessage(new TextComponentString("Reloaded"));
 		}
-		else if(args.length > 0 && args[0].equalsIgnoreCase("version"))
+		else if(args[0].equalsIgnoreCase("version"))
 		{
 			sender.addChatMessage(new TextComponentString("Schematics Overload Version " + SchematicsCore.VERSION));
 		}
@@ -76,37 +81,77 @@ public class SchematicsServerCommands extends CommandBase
 					EntityPlayer player = (EntityPlayer) sender;
 					if(player.capabilities.isCreativeMode)
 					{
-						if(args.length >= 3)
+
+						if(args[1].equalsIgnoreCase("setPoint"))
 						{
-							if(args[1].equalsIgnoreCase("setPoint"))
+							if(args.length < 3)
 							{
-								if(args[2].equalsIgnoreCase("1"))
-								{
-									SchematicUtil.pos1 = new BlockPos((int) player.posX, (int) player.posY - 1, (int) player.posZ);
-									sender.addChatMessage(new TextComponentString("Point 1 set"));
-								}
-								if(args[2].equalsIgnoreCase("2"))
-								{
-									SchematicUtil.pos2 = new BlockPos((int) player.posX, (int) player.posY - 1, (int) player.posZ);
-									sender.addChatMessage(new TextComponentString("Point 2 set"));
-								}
+								invalidArguments(sender);
+								return;
 							}
-							else if(args[1].equalsIgnoreCase("create"))
+
+							if(args[2].equalsIgnoreCase("1"))
 							{
-								if(SchematicUtil.pos1 == null || SchematicUtil.pos2 == null)
-								{
-									sender.addChatMessage(new TextComponentString("Both points are not set!"));
-									return;
-								}
-								// TODO Create schematic
-								sender.addChatMessage(new TextComponentString("Schematic file named " + (args[2].endsWith(".ccs") ? args[2] : args[2] + ".ccs") + " created!"));
-								SchematicUtil.pos1 = null;
-								SchematicUtil.pos2 = null;
+								SchematicUtil.pos1 = new BlockPos((int) player.posX, (int) player.posY - 1, (int) player.posZ);
+								sender.addChatMessage(new TextComponentString("Point 1 set"));
+							}
+							else if(args[2].equalsIgnoreCase("2"))
+							{
+								SchematicUtil.pos2 = new BlockPos((int) player.posX, (int) player.posY - 1, (int) player.posZ);
+								sender.addChatMessage(new TextComponentString("Point 2 set"));
 							}
 						}
-						else
+						else if(args[1].equalsIgnoreCase("create"))
 						{
-							sender.addChatMessage(new TextComponentString("invalid arguments"));
+							if(args.length < 3)
+							{
+								invalidArguments(sender);
+								return;
+							}
+
+							if(SchematicUtil.pos1 == null || SchematicUtil.pos2 == null)
+							{
+								sender.addChatMessage(new TextComponentString("Both points are not set!"));
+								return;
+							}
+							// TODO Create schematic
+							sender.addChatMessage(new TextComponentString("Schematic file named " + (args[2].endsWith(".ccs") ? args[2] : args[2] + ".ccs") + " created!"));
+							SchematicUtil.pos1 = null;
+							SchematicUtil.pos2 = null;
+						}
+						else if(args[1].equalsIgnoreCase("replace"))
+						{
+							if(args.length < 4)
+							{
+								invalidArguments(sender);
+								return;
+							}
+
+							IBlockState oldState;
+							IBlockState newState;
+							try
+							{
+								String[] oldBlockData = args[2].split(":");
+								String[] newBlockData = args[3].split(":");
+								Block oldBlock = SchematicUtil.getBlock(oldBlockData[0], oldBlockData[1]);
+								Block newBlock = SchematicUtil.getBlock(newBlockData[0], newBlockData[1]);
+
+								if(oldBlockData.length > 2)
+									oldState = oldBlock.getStateFromMeta(Integer.parseInt(oldBlockData[2]));
+								else
+									oldState = oldBlock.getDefaultState();
+
+								if(newBlockData.length > 2)
+									newState = newBlock.getStateFromMeta(Integer.parseInt(newBlockData[2]));
+								else
+									newState = newBlock.getDefaultState();
+							} catch(Exception e)
+							{
+								sender.addChatMessage(new TextComponentString("The blocks you have entered are invalid. Use the format \"(Mod):(Block):(Meta)\". Meta is optional"));
+								return;
+							}
+
+							SchematicUtil.replaceBlocksInSelection(world, oldState, newState);
 						}
 					}
 					else
@@ -126,7 +171,7 @@ public class SchematicsServerCommands extends CommandBase
 		}
 		else
 		{
-			sender.addChatMessage(new TextComponentString("Invalid arguments for the command"));
+			invalidArguments(sender);
 		}
 	}
 
@@ -144,4 +189,8 @@ public class SchematicsServerCommands extends CommandBase
 		return null;
 	}
 
+	public void invalidArguments(ICommandSender sender)
+	{
+		sender.addChatMessage(new TextComponentString("Invalid arguments for the command"));
+	}
 }
