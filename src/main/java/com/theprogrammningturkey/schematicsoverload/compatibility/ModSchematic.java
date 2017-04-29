@@ -33,7 +33,7 @@ public class ModSchematic implements ISchematicCompat
 	@Override
 	public Schematic loadSchematic(String fileName, boolean includeAirBlocks)
 	{
-		JsonElement elem = FileUtil.readJsonfromFile(FileUtil.folder.getAbsolutePath() + "/" + fileName);
+		JsonElement elem = FileUtil.readJsonfromCompressedFile(this.getCompatModFolder().getAbsolutePath() + "/" + fileName);
 		if(elem == null)
 			return null;
 		JsonObject json = elem.getAsJsonObject();
@@ -42,18 +42,21 @@ public class ModSchematic implements ISchematicCompat
 		int xSize = info.get("xSize").getAsInt();
 		int ySize = info.get("ySize").getAsInt();
 		int zSize = info.get("zSize").getAsInt();
-		String version = info.get("version").getAsString();
-		String[] fileMajorMinor = version.split(".");
-		String[] modMajorMinor = version.split(".");
-		if(Integer.parseInt(modMajorMinor[0]) < Integer.parseInt(fileMajorMinor[0]))
-		{
-			if(Integer.parseInt(modMajorMinor[1]) != Integer.parseInt(fileMajorMinor[1]))
-			{
-				// Minor version numbers do not match
-			}
-
-			// Incompatible versions
-		}
+		// String version = info.get("version").getAsString();
+		// System.out.println(version);
+		// String[] fileMajorMinor = version.split(".");
+		// System.out.println(Arrays.toString(fileMajorMinor));
+		// String[] modMajorMinor = SchematicsCore.SCHEMATIC_VERSION.split(".");
+		// System.out.println(Arrays.toString(modMajorMinor));
+		// if(Integer.parseInt(modMajorMinor[0]) < Integer.parseInt(fileMajorMinor[0]))
+		// {
+		// if(Integer.parseInt(modMajorMinor[1]) != Integer.parseInt(fileMajorMinor[1]))
+		// {
+		// // Minor version numbers do not match
+		// }
+		//
+		// // Incompatible versions
+		// }
 
 		List<CustomEntry<Integer, String>> blockDataIds = new ArrayList<CustomEntry<Integer, String>>();
 
@@ -252,7 +255,7 @@ public class ModSchematic implements ISchematicCompat
 		info.addProperty("zSize", large.getZ() - small.getZ());
 		json.add("Schematic Data", info);
 
-		FileUtil.writeToFile(this.getCompatModFolder(), fileName, json);
+		FileUtil.writeToCompressedFile(this.getCompatModFolder(), fileName, json);
 	}
 
 	public SchematicTileEntity OffsetBlockToTileEntity(SchematicBlock osb, String nbt)
@@ -277,5 +280,11 @@ public class ModSchematic implements ISchematicCompat
 	public File getCompatModFolder()
 	{
 		return new File(FileUtil.folder, "Schematic Overload");
+	}
+
+	@Override
+	public String getFileExtension()
+	{
+		return ".tson";
 	}
 }

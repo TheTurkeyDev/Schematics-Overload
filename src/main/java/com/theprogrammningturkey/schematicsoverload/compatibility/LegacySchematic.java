@@ -21,11 +21,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class LegacySchematics implements ISchematicCompat
+public class LegacySchematic implements ISchematicCompat
 {
 	public Schematic loadSchematic(String fileName, boolean includeAirBlocks)
 	{
-		File schematic = new File(FileUtil.folder, fileName);
+		File schematic = new File(this.getCompatModFolder(), fileName);
 		NBTTagCompound nbtdata;
 		try
 		{
@@ -92,16 +92,22 @@ public class LegacySchematics implements ISchematicCompat
 
 		return new Schematic(offsetBlocks, width, height, length, includeAirBlocks);
 	}
-	
+
 	@Override
 	public void createSchematic(String fileName, World world)
 	{
-		
+
 	}
 
 	@Override
 	public File getCompatModFolder()
 	{
 		return new File(FileUtil.folder, "Legacy");
+	}
+
+	@Override
+	public String getFileExtension()
+	{
+		return ".schematic";
 	}
 }

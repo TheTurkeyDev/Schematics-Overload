@@ -5,6 +5,7 @@ import java.io.File;
 import org.apache.logging.log4j.Logger;
 
 import com.theprogrammningturkey.schematicsoverload.commands.SchematicsServerCommands;
+import com.theprogrammningturkey.schematicsoverload.compatibility.SchematicsManager;
 import com.theprogrammningturkey.schematicsoverload.proxy.CommonProxy;
 import com.theprogrammningturkey.schematicsoverload.util.FileUtil;
 
@@ -55,6 +56,7 @@ public class SchematicsCore
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
+		SchematicsManager.loadSchematics();
 	}
 
 	@EventHandler

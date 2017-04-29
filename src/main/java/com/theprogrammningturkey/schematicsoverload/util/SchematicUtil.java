@@ -13,8 +13,9 @@ public class SchematicUtil
 
 	public static void replaceBlocksInSelection(World world, IBlockState oldState, IBlockState newState)
 	{
-		if(pos1 == null || pos2 == null)
+		if(pos1 == null || pos2 == null || oldState == null || newState == null)
 			return;
+
 		CustomEntry<BlockPos, BlockPos> highlow = SchematicUtil.getHigherLowerPosition(pos1, pos2);
 		BlockPos large = highlow.getKey();
 		BlockPos small = highlow.getValue();
@@ -46,7 +47,7 @@ public class SchematicUtil
 		int smallZ = loc1.getZ() < loc2.getZ() ? loc1.getZ() : loc2.getZ();
 		return new CustomEntry<BlockPos, BlockPos>(new BlockPos(largeX, largeY, largeZ), new BlockPos(smallX, smallY, smallZ));
 	}
-	
+
 	public static Block getBlock(String mod, String blockName)
 	{
 		return Block.REGISTRY.getObject(new ResourceLocation(mod, blockName));

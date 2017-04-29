@@ -6,11 +6,13 @@ import com.theprogrammningturkey.schematicsoverload.util.Schematic;
 
 import net.minecraft.world.World;
 
-interface ISchematicCompat
+public interface ISchematicCompat
 {
-	public void createSchematic(String fileName, World world);
-	
-	public Schematic loadSchematic(String fileName, boolean includeAirBlocks);
-	
-	public File getCompatModFolder();
+	void createSchematic(String fileName, World world);
+
+	Schematic loadSchematic(String fileName, boolean includeAirBlocks);
+
+	File getCompatModFolder();
+
+	String getFileExtension();
 }

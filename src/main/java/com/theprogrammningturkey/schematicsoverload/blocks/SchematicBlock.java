@@ -7,18 +7,18 @@ public class SchematicBlock
 {
 	private IBlockState state;
 	private BlockPos pos;
-	
+
 	public SchematicBlock(IBlockState state, BlockPos pos)
 	{
 		this.state = state;
 		this.pos = pos;
 	}
-	
+
 	public IBlockState getBlockState()
 	{
 		return state;
 	}
-	
+
 	public BlockPos getBlockOffSet()
 	{
 		return this.pos;

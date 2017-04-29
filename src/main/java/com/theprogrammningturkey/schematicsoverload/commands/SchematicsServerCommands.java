@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.theprogrammningturkey.schematicsoverload.SchematicsCore;
+import com.theprogrammningturkey.schematicsoverload.blocks.SchematicBlock;
+import com.theprogrammningturkey.schematicsoverload.compatibility.ISchematicCompat;
+import com.theprogrammningturkey.schematicsoverload.compatibility.SchematicsManager;
+import com.theprogrammningturkey.schematicsoverload.util.Schematic;
 import com.theprogrammningturkey.schematicsoverload.util.SchematicUtil;
 
 import net.minecraft.block.Block;
@@ -65,11 +69,23 @@ public class SchematicsServerCommands extends CommandBase
 
 		if(args[0].equalsIgnoreCase("reload"))
 		{
+			SchematicsManager.loadSchematics();
 			sender.addChatMessage(new TextComponentString("Reloaded"));
 		}
 		else if(args[0].equalsIgnoreCase("version"))
 		{
 			sender.addChatMessage(new TextComponentString("Schematics Overload Version " + SchematicsCore.VERSION));
+		}
+		else if(args[0].equalsIgnoreCase("listSchematics"))
+		{
+			StringBuilder sb = new StringBuilder();
+			for(String s : SchematicsManager.getLoadedSchematicNames())
+			{
+				sb.append(s);
+				sb.append(",");
+			}
+			sb.deleteCharAt(sb.length() - 1);
+			sender.addChatMessage(new TextComponentString("Loaded Schematics: " + sb.toString()));
 		}
 		else if(args[0].equalsIgnoreCase("schematic"))
 		{
@@ -81,7 +97,6 @@ public class SchematicsServerCommands extends CommandBase
 					EntityPlayer player = (EntityPlayer) sender;
 					if(player.capabilities.isCreativeMode)
 					{
-
 						if(args[1].equalsIgnoreCase("setPoint"))
 						{
 							if(args.length < 3)
@@ -114,8 +129,22 @@ public class SchematicsServerCommands extends CommandBase
 								sender.addChatMessage(new TextComponentString("Both points are not set!"));
 								return;
 							}
-							// TODO Create schematic
-							sender.addChatMessage(new TextComponentString("Schematic file named " + (args[2].endsWith(".ccs") ? args[2] : args[2] + ".ccs") + " created!"));
+							ISchematicCompat compat = SchematicsManager.getSchematicCompatForName(args.length > 3 ? args[3] : SchematicsCore.MODID);
+							String fileName = args[2];
+							if(fileName.contains("."))
+							{
+								if(!fileName.substring(fileName.indexOf(".") - 1).equals(compat.getFileExtension()))
+								{
+									fileName = fileName.substring(0, fileName.indexOf(".")) + compat.getFileExtension();
+								}
+							}
+							else
+							{
+								fileName += compat.getFileExtension();
+							}
+
+							compat.createSchematic(fileName, world);
+							sender.addChatMessage(new TextComponentString("Schematic file " + fileName + " created and put into " + compat.getCompatModFolder().getName() + " folder!"));
 							SchematicUtil.pos1 = null;
 							SchematicUtil.pos2 = null;
 						}
@@ -153,6 +182,27 @@ public class SchematicsServerCommands extends CommandBase
 
 							SchematicUtil.replaceBlocksInSelection(world, oldState, newState);
 						}
+						else if(args[1].equalsIgnoreCase("spawn"))
+						{
+							if(args.length < 2)
+							{
+								invalidArguments(sender);
+								return;
+							}
+							Schematic schematic = SchematicsManager.getSchematic(args[2]);
+							if(schematic != null)
+							{
+								BlockPos playerPos = player.getPosition();
+								for(SchematicBlock sb : schematic.getBlocks())
+								{
+									world.setBlockState(playerPos.add(sb.getBlockOffSet()), sb.getBlockState());
+								}
+							}
+							else
+							{
+								sender.addChatMessage(new TextComponentString("Sorry, no schematic is loaded with that name!"));
+							}
+						}
 					}
 					else
 					{
@@ -164,6 +214,10 @@ public class SchematicsServerCommands extends CommandBase
 			{
 				sender.addChatMessage(new TextComponentString("Sorry, but this command only works in single player"));
 			}
+		}
+		else if(args[0].equalsIgnoreCase("spawnSchematic"))
+		{
+
 		}
 		else if(args[0].equalsIgnoreCase("test"))
 		{

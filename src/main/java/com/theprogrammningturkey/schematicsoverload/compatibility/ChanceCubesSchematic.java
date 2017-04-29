@@ -9,7 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.theprogrammningturkey.schematicsoverload.SchematicsCore;
 import com.theprogrammningturkey.schematicsoverload.blocks.SchematicBlock;
 import com.theprogrammningturkey.schematicsoverload.blocks.SchematicTileEntity;
 import com.theprogrammningturkey.schematicsoverload.util.CustomEntry;
@@ -33,7 +32,7 @@ public class ChanceCubesSchematic implements ISchematicCompat
 	@Override
 	public Schematic loadSchematic(String fileName, boolean includeAirBlocks)
 	{
-		JsonElement elem = FileUtil.readJsonfromFile(FileUtil.folder.getAbsolutePath() + "/" + fileName);
+		JsonElement elem = FileUtil.readJsonfromFile(this.getCompatModFolder().getAbsolutePath() + "/" + fileName);
 		if(elem == null)
 			return null;
 		JsonObject json = elem.getAsJsonObject();
@@ -121,7 +120,7 @@ public class ChanceCubesSchematic implements ISchematicCompat
 	{
 		BlockPos loc1 = SchematicUtil.pos1;
 		BlockPos loc2 = SchematicUtil.pos2;
-		
+
 		List<Integer> blocks = new ArrayList<Integer>();
 		List<CustomEntry<Integer, String>> blockDataIds = new ArrayList<CustomEntry<Integer, String>>();
 		List<CustomEntry<String, List<Integer>>> tileEntityData = new ArrayList<CustomEntry<String, List<Integer>>>();
@@ -264,5 +263,11 @@ public class ChanceCubesSchematic implements ISchematicCompat
 	public File getCompatModFolder()
 	{
 		return new File(FileUtil.folder, "Chance Cubes");
+	}
+
+	@Override
+	public String getFileExtension()
+	{
+		return ".ccs";
 	}
 }
