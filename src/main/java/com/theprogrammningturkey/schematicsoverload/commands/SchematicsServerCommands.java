@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.theprogrammningturkey.schematicsoverload.SchematicsCore;
 import com.theprogrammningturkey.schematicsoverload.blocks.SchematicBlock;
-import com.theprogrammningturkey.schematicsoverload.compatibility.ISchematicCompat;
+import com.theprogrammningturkey.schematicsoverload.client.gui.SchematicCreationGui;
 import com.theprogrammningturkey.schematicsoverload.compatibility.SchematicsManager;
 import com.theprogrammningturkey.schematicsoverload.util.Schematic;
 import com.theprogrammningturkey.schematicsoverload.util.SchematicUtil;
@@ -16,11 +16,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class SchematicsServerCommands extends CommandBase
 {
@@ -118,7 +121,7 @@ public class SchematicsServerCommands extends CommandBase
 						}
 						else if(args[1].equalsIgnoreCase("create"))
 						{
-							if(args.length < 3)
+							if(args.length < 2)
 							{
 								invalidArguments(sender);
 								return;
@@ -129,24 +132,8 @@ public class SchematicsServerCommands extends CommandBase
 								sender.addChatMessage(new TextComponentString("Both points are not set!"));
 								return;
 							}
-							ISchematicCompat compat = SchematicsManager.getSchematicCompatForName(args.length > 3 ? args[3] : SchematicsCore.MODID);
-							String fileName = args[2];
-							if(fileName.contains("."))
-							{
-								if(!fileName.substring(fileName.indexOf(".") - 1).equals(compat.getFileExtension()))
-								{
-									fileName = fileName.substring(0, fileName.indexOf(".")) + compat.getFileExtension();
-								}
-							}
-							else
-							{
-								fileName += compat.getFileExtension();
-							}
 
-							compat.createSchematic(fileName, world);
-							sender.addChatMessage(new TextComponentString("Schematic file " + fileName + " created and put into " + compat.getCompatModFolder().getName() + " folder!"));
-							SchematicUtil.pos1 = null;
-							SchematicUtil.pos2 = null;
+							FMLCommonHandler.instance().showGuiScreen(new SchematicCreationGui(player));
 						}
 						else if(args[1].equalsIgnoreCase("replace"))
 						{
@@ -196,6 +183,11 @@ public class SchematicsServerCommands extends CommandBase
 								for(SchematicBlock sb : schematic.getBlocks())
 								{
 									world.setBlockState(playerPos.add(sb.getBlockOffSet()), sb.getBlockState());
+								}
+
+								for(NBTTagCompound nbt : schematic.getEntities())
+								{
+									world.spawnEntityInWorld(EntityList.createEntityFromNBT(nbt, world));
 								}
 							}
 							else

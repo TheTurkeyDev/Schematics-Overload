@@ -10,6 +10,7 @@ import com.theprogrammningturkey.schematicsoverload.blocks.SchematicBlock;
 import com.theprogrammningturkey.schematicsoverload.blocks.SchematicTileEntity;
 import com.theprogrammningturkey.schematicsoverload.util.FileUtil;
 import com.theprogrammningturkey.schematicsoverload.util.Schematic;
+import com.theprogrammningturkey.schematicsoverload.util.SchematicCreationSettings;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -94,7 +95,7 @@ public class LegacySchematic implements ISchematicCompat
 	}
 
 	@Override
-	public void createSchematic(String fileName, World world)
+	public void createSchematic(String fileName, World world, SchematicCreationSettings settings)
 	{
 
 	}

@@ -14,6 +14,7 @@ import com.theprogrammningturkey.schematicsoverload.blocks.SchematicTileEntity;
 import com.theprogrammningturkey.schematicsoverload.util.CustomEntry;
 import com.theprogrammningturkey.schematicsoverload.util.FileUtil;
 import com.theprogrammningturkey.schematicsoverload.util.Schematic;
+import com.theprogrammningturkey.schematicsoverload.util.SchematicCreationSettings;
 import com.theprogrammningturkey.schematicsoverload.util.SchematicUtil;
 
 import net.minecraft.block.Block;
@@ -116,7 +117,7 @@ public class ChanceCubesSchematic implements ISchematicCompat
 	}
 
 	@Override
-	public void createSchematic(String fileName, World world)
+	public void createSchematic(String fileName, World world, SchematicCreationSettings settings)
 	{
 		BlockPos loc1 = SchematicUtil.pos1;
 		BlockPos loc2 = SchematicUtil.pos2;

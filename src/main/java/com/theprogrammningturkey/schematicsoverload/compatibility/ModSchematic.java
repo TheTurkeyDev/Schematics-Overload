@@ -15,16 +15,19 @@ import com.theprogrammningturkey.schematicsoverload.blocks.SchematicTileEntity;
 import com.theprogrammningturkey.schematicsoverload.util.CustomEntry;
 import com.theprogrammningturkey.schematicsoverload.util.FileUtil;
 import com.theprogrammningturkey.schematicsoverload.util.Schematic;
+import com.theprogrammningturkey.schematicsoverload.util.SchematicCreationSettings;
 import com.theprogrammningturkey.schematicsoverload.util.SchematicUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -105,6 +108,20 @@ public class ModSchematic implements ISchematicCompat
 			}
 		}
 
+		List<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+		JsonArray entArray = json.get("Entities").getAsJsonArray();
+
+		for(JsonElement entNBT : entArray)
+		{
+			try
+			{
+				entities.add((NBTTagCompound) JsonToNBT.getTagFromJson(entNBT.getAsString()));
+			} catch(NBTException e)
+			{
+
+			}
+		}
+
 		JsonArray teArray = json.get("TileEntities").getAsJsonArray();
 		for(JsonElement i : teArray)
 		{
@@ -129,11 +146,11 @@ public class ModSchematic implements ISchematicCompat
 				offsetBlocks.remove(i);
 		}
 
-		return new Schematic(offsetBlocks, xSize, ySize, zSize, includeAirBlocks);
+		return new Schematic(offsetBlocks, entities, xSize, ySize, zSize, includeAirBlocks);
 	}
 
 	@Override
-	public void createSchematic(String fileName, World world)
+	public void createSchematic(String fileName, World world, SchematicCreationSettings settings)
 	{
 		BlockPos loc1 = SchematicUtil.pos1;
 		BlockPos loc2 = SchematicUtil.pos2;
@@ -247,6 +264,18 @@ public class ModSchematic implements ISchematicCompat
 			tileEntityDataArray.add(index);
 		}
 		json.add("TileEntities", tileEntityDataArray);
+
+		List<Entity> entities = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(loc1, loc2), null);
+		JsonArray entityDataArray = new JsonArray();
+		if(settings.includeEntities)
+		{
+			for(Entity ent : entities)
+			{
+				NBTTagCompound nbt = ent.writeToNBT(new NBTTagCompound());
+				entityDataArray.add(new JsonPrimitive(nbt.toString()));
+			}
+		}
+		json.add("Entities", entityDataArray);
 
 		JsonObject info = new JsonObject();
 		info.addProperty("version", SchematicsCore.SCHEMATIC_VERSION);

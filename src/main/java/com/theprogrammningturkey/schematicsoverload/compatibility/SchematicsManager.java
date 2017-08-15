@@ -19,6 +19,7 @@ public class SchematicsManager
 		schematicTypes.put(SchematicsCore.MODID, new ModSchematic());
 		schematicTypes.put("legacy", new LegacySchematic());
 		schematicTypes.put("chancecubes", new ChanceCubesSchematic());
+		//schematicTypes.put("reccomplex", new RecurrentComplexSchematic());
 	}
 
 	public static ISchematicCompat getSchematicCompatForName(String name)

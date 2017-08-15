@@ -11,6 +11,7 @@ import com.theprogrammningturkey.schematicsoverload.util.FileUtil;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -27,6 +28,9 @@ public class SchematicsCore
 	public static final String SCHEMATIC_VERSION = "1.0";
 
 	public static Logger logger;
+
+	@Instance(value = MODID)
+	public static SchematicsCore instance;
 
 	@SidedProxy(clientSide = "com.theprogrammningturkey.schematicsoverload.proxy.ClientProxy", serverSide = "com.theprogrammningturkey.schematicsoverload.proxy.CommonProxy")
 	public static CommonProxy proxy;
